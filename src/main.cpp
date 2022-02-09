@@ -26,8 +26,8 @@ unsigned int dt = 0;  //różnica czasu
 unsigned long prevt = 0;  //poprzedni czas
 //wartości do pętli PID
 float kp = 1; //współczynnik KP
-float ki = 0; //współczynnik KI
-float kd = 0; //współczynnik KD
+float ki = 0.0001; //współczynnik KI
+float kd = 10; //współczynnik KD
 int inputPosition = 50;  //pozycja zadana
 int pwm = 0;  //wyjście do elementu sterującego silnikiem
 int error = 0;  //uchyb
@@ -65,7 +65,7 @@ void PID (int input) {
 
   t = micros();  //czas od uruchomienia
 
-  dt = t - prevt; //czas delta
+  dt = (t - prevt)/(10^6); //czas delta (konwersja na sekundy)
 
   sensorScaled = map(filteredSensor, 0, 4095, 0, 255); //skalowanie sensora do wartości 8-bitowej
 
@@ -117,6 +117,6 @@ Serial.print("pwm: ");
 Serial.println(pwm);
 Serial.println();
 
-delay(1000);
+delay(10);
 
 }
