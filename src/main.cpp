@@ -75,9 +75,9 @@ void PID (int input) {
   pwm = kp*error + ki*totalError*dt + kd*(error-prevError)/dt; //PID (k + całka + różniczka)
   
   if (error > 0){ //zmiana kierunku silnika w zależności od tego w którą stronę jest uchyb
-    direction = 1;
-  } else {
     direction = 0;
+  } else {
+    direction = 1;
   }
 
   pwm = constrain(abs(pwm), 0, 255); // wyeliminowanie większych wartości niż jest w stanie podać pin (255 to wartość odpowiadająca 100% wypełnieniu sygnału) oraz wzięcie wartości bezwzględnej bo kierunek regulujemy przez direction
