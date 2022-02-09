@@ -5,7 +5,7 @@
 |  sygnał   |=>|   +   |=>uchyb=>|    PID    |=>sygnał sterujący=>|  silnik   |=>feedback (potencjometr/enkoder)
 |-----------|   \-----/          |-----------|                    |-----------|
                   -feedback
-*/TEKETKISTIJI
+*/
 //definicje pinów
 #define outpin 22
 #define senspin 32
