@@ -4,8 +4,8 @@
 |-----------|   /-----\          |-----------|                    |-----------|
 |  sygnał   |=>|   +   |=>uchyb=>|    PID    |=>sygnał sterujący=>|  silnik   |=>feedback (potencjometr/enkoder)
 |-----------|   \-----/          |-----------|                    |-----------|
-                  -Y
-*/
+                  -feedback
+*/TEKETKISTIJI
 //definicje pinów
 #define outpin 22
 #define senspin 32
