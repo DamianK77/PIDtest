@@ -28,13 +28,14 @@ unsigned long prevt = 0;  //poprzedni czas
 float kp = 1; //współczynnik KP
 float ki = 0; //współczynnik KI
 float kd = 0; //współczynnik KD
-int inputPosition = 0;  //pozycja zadana
+int inputPosition = 50;  //pozycja zadana
 int pwm = 0;  //wyjście do elementu sterującego silnikiem
 int error = 0;  //uchyb
 int totalError = 0;  //kumulowany uchyb
 int prevError = 0; //poprzedni uchyb
 bool direction = 0; //kierunek obrotu silnika
 
+int typed = 0;  //wpisane do portu szeregowego
 //konstruktor filtru MA
 movingAvg sensor(3); 
 
@@ -59,7 +60,7 @@ void setup() {
 
 
 // funkcja wykonująca PID, zapisuje wartość w zmiennej pwm, jako wejście jest sygnał zadany - pozycja od 0 do 255
-void PID (int inputPosition) {
+void PID (int input) {
 
 
   t = micros();  //czas od uruchomienia
@@ -68,7 +69,7 @@ void PID (int inputPosition) {
 
   sensorScaled = map(filteredSensor, 0, 4095, 0, 255); //skalowanie sensora do wartości 8-bitowej
 
-  error = inputPosition - sensorScaled; //liczenie uchybu (węzeł na wejściu pętli sterowania)
+  error = input - sensorScaled; //liczenie uchybu (węzeł na wejściu pętli sterowania)
   totalError += error; //kumulacyjny uchyb (do całkowania)
 
   pwm = kp*error + ki*totalError*dt + kd*(error-prevError)/dt; //PID (k + całka + różniczka)
@@ -95,8 +96,16 @@ Serial.println(filteredSensor);
 Serial.print("direction: ");
 Serial.println(direction);
 
-//wykonanie cyklu PID
-PID(120);
+//wczytanie sygnały zadanego od użytkownika i wykonanie cyklu PID
+if (Serial.available() > 0) {
+  typed = Serial.parseInt();
+  if (typed > 0) {
+    inputPosition = typed;
+    Serial.print("Position set: ");
+    Serial.println(inputPosition);
+  }
+}
+PID(inputPosition);
 
 //wysłanie sygnału do elementu wykonawczego (sterownika silnika)
 ledcWrite(channel, pwm); // wysłanie prędkości
@@ -108,6 +117,6 @@ Serial.print("pwm: ");
 Serial.println(pwm);
 Serial.println();
 
-delay(10);
+delay(1000);
 
 }
