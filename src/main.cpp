@@ -25,10 +25,10 @@ unsigned long t = 0;  //czas od początku programu (mikrosekundy)
 float dt = 0.0;  //różnica czasu
 unsigned long prevt = 0;  //poprzedni czas
 //wartości do pętli PID
-float kp = 1.0; //współczynnik KP
+float kp = 0.617; //współczynnik KP
 float ki = 0.0; //współczynnik KI
 float kd = 0.0; //współczynnik KD
-int inputPosition = 0;  //pozycja zadana
+int inputPosition = 50;  //pozycja zadana
 int pwm = 0;  //wyjście do elementu sterującego silnikiem
 float error = 0.0;  //uchyb
 float totalError = 0.0;  //kumulowany uchyb
@@ -38,7 +38,7 @@ bool direction = 0; //kierunek obrotu silnika
 
 int typed = 0;  //wpisane do portu szeregowego
 //konstruktor filtru MA
-movingAvg sensor(1); 
+movingAvg sensor(4); 
 
 void setup() {
 
@@ -58,7 +58,6 @@ void setup() {
   //inicjalizacja portu szeregowego
   Serial.begin(9600);
 }
-
 
 // funkcja wykonująca PID, zapisuje wartość w zmiennej pwm, jako wejście jest sygnał zadany - pozycja od 0 do 255
 void PID (int input) {
@@ -113,9 +112,8 @@ if (Serial.available() > 0) {
     //Serial.println(inputPosition);
   }
 }
-  PID(inputPosition);
 
-
+PID(inputPosition);
 
 //wysłanie sygnału do elementu wykonawczego (sterownika silnika)
 ledcWrite(channel, pwm); // wysłanie prędkości
