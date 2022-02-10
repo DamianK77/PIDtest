@@ -22,17 +22,18 @@ int filteredSensor = 0; //dane przefiltrowane filtrem MA
 int sensorScaled = 0; //dane przeskalowane do 0-255
 //wartości czasowe
 unsigned long t = 0;  //czas od początku programu (mikrosekundy)
-unsigned int dt = 0;  //różnica czasu
+float dt = 0.0;  //różnica czasu
 unsigned long prevt = 0;  //poprzedni czas
 //wartości do pętli PID
-float kp = 0.9; //współczynnik KP
-float ki = 0; //współczynnik KI
-float kd = 0; //współczynnik KD
-int inputPosition = 50;  //pozycja zadana
+float kp = 1.0; //współczynnik KP
+float ki = 0.0; //współczynnik KI
+float kd = 0.0; //współczynnik KD
+int inputPosition = 0;  //pozycja zadana
 int pwm = 0;  //wyjście do elementu sterującego silnikiem
-int error = 0;  //uchyb
-int totalError = 0;  //kumulowany uchyb
-int prevError = 0; //poprzedni uchyb
+float error = 0.0;  //uchyb
+float totalError = 0.0;  //kumulowany uchyb
+float prevError = 0.0; //poprzedni uchyb
+float diffError = 0.0;  //różnica uchybów do różniczki
 bool direction = 0; //kierunek obrotu silnika
 
 int typed = 0;  //wpisane do portu szeregowego
@@ -65,14 +66,14 @@ void PID (int input) {
 
   t = micros();  //czas od uruchomienia
 
-  dt = (t - prevt)/(10^6); //czas delta (konwersja na sekundy)
-
+  dt = (t - prevt)/1000000.0; //czas delta (konwersja na sekundy)
   sensorScaled = map(filteredSensor, 0, 4095, 0, 255); //skalowanie sensora do wartości 8-bitowej
 
   error = input - sensorScaled; //liczenie uchybu (węzeł na wejściu pętli sterowania)
   totalError += error; //kumulacyjny uchyb (do całkowania)
+  diffError = error-prevError;  //różnica uchybów (de do różniczkowania)
 
-  pwm = kp*error + ki*totalError*dt + kd*(error-prevError)/dt; //PID (k + całka + różniczka)
+  pwm = kp*error + ki*totalError*dt + kd*diffError/dt; //PID (k + całka + różniczka)
   
   if (error > 0){ //zmiana kierunku silnika w zależności od tego w którą stronę jest uchyb
     direction = 0;
@@ -92,7 +93,14 @@ void loop() { //główna pętla
 rawSensor = analogRead(senspin);
 filteredSensor = sensor.reading(rawSensor);
 //Serial.print("Filtered sensor data: ");
-//Serial.println(filteredSensor);
+Serial.print(sensorScaled);
+Serial.print(" ");
+Serial.println(inputPosition);
+//Serial.print(" ");
+//Serial.print(pwm);
+//Serial.print("  ");
+//Serial.println(dt*1000000.0);
+
 //Serial.print("direction: ");
 //Serial.println(direction);
 
@@ -105,7 +113,9 @@ if (Serial.available() > 0) {
     //Serial.println(inputPosition);
   }
 }
-PID(inputPosition);
+  PID(inputPosition);
+
+
 
 //wysłanie sygnału do elementu wykonawczego (sterownika silnika)
 ledcWrite(channel, pwm); // wysłanie prędkości
