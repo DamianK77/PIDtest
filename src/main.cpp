@@ -13,7 +13,7 @@
 #define IN2 23
 
 //wartości dla inicjalizacji PWM
-const int freq = 20; //częstotliwość pwm
+const int freq = 30000; //częstotliwość pwm
 const int channel = 0;  //kanał pwm
 const int resolution = 8; //rozdzielczość (0-255)
 //wartości sensora (potencjometru)
@@ -25,7 +25,7 @@ unsigned long t = 0;  //czas od początku programu (mikrosekundy)
 unsigned int dt = 0;  //różnica czasu
 unsigned long prevt = 0;  //poprzedni czas
 //wartości do pętli PID
-float kp = 1; //współczynnik KP
+float kp = 0.9; //współczynnik KP
 float ki = 0; //współczynnik KI
 float kd = 0; //współczynnik KD
 int inputPosition = 50;  //pozycja zadana
@@ -37,7 +37,7 @@ bool direction = 0; //kierunek obrotu silnika
 
 int typed = 0;  //wpisane do portu szeregowego
 //konstruktor filtru MA
-movingAvg sensor(3); 
+movingAvg sensor(1); 
 
 void setup() {
 
@@ -91,18 +91,18 @@ void loop() { //główna pętla
 //filtr wejścia z sensora i debugging przez port szeregowy
 rawSensor = analogRead(senspin);
 filteredSensor = sensor.reading(rawSensor);
-Serial.print("Filtered sensor data: ");
-Serial.println(filteredSensor);
-Serial.print("direction: ");
-Serial.println(direction);
+//Serial.print("Filtered sensor data: ");
+//Serial.println(filteredSensor);
+//Serial.print("direction: ");
+//Serial.println(direction);
 
 //wczytanie sygnały zadanego od użytkownika i wykonanie cyklu PID
 if (Serial.available() > 0) {
   typed = Serial.parseInt();
   if (typed > 0) {
     inputPosition = typed;
-    Serial.print("Position set: ");
-    Serial.println(inputPosition);
+    //Serial.print("Position set: ");
+    //Serial.println(inputPosition);
   }
 }
 PID(inputPosition);
@@ -113,10 +113,8 @@ digitalWrite(IN1, direction); // wysłanie kierunku
 digitalWrite(IN2, !direction);
 
 //debug
-Serial.print("pwm: ");
-Serial.println(pwm);
-Serial.println();
-
-delay(10);
+//Serial.print("pwm: ");
+//Serial.println(pwm);
+//Serial.println();
 
 }
