@@ -40,7 +40,7 @@ int typed = 0;  //wpisane do portu szeregowego
 //konstruktor filtru MA
 movingAvg sensor(4); 
 
-void setup() {
+void setup () {
 
   //inicjalizacja pwm
   ledcSetup(channel, freq, resolution);
@@ -106,7 +106,7 @@ void debug () {
   //Serial.println(direction);
 }
 
-void loop() { //główna pętla
+void loop () { //główna pętla
 
 readSensor();
 debug();
