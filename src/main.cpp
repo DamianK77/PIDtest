@@ -86,24 +86,32 @@ void PID (int input) {
   prevt = t;
 }
 
+void readSensor () {
+  //filtr wejścia z sensora i debugging przez port szeregowy
+  rawSensor = analogRead(senspin);
+  filteredSensor = sensor.reading(rawSensor);
+}
+
+void debug () {
+  //----------------debug
+  //Serial.print("Filtered sensor data: ");
+  Serial.print(sensorScaled);
+  Serial.print(" ");
+  Serial.println(inputPosition);
+  //Serial.print(" ");
+  //Serial.print(pwm);
+  //Serial.print("  ");
+  //Serial.println(dt*1000000.0);
+  //Serial.print("direction: ");
+  //Serial.println(direction);
+}
+
 void loop() { //główna pętla
 
-//filtr wejścia z sensora i debugging przez port szeregowy
-rawSensor = analogRead(senspin);
-filteredSensor = sensor.reading(rawSensor);
-//Serial.print("Filtered sensor data: ");
-Serial.print(sensorScaled);
-Serial.print(" ");
-Serial.println(inputPosition);
-//Serial.print(" ");
-//Serial.print(pwm);
-//Serial.print("  ");
-//Serial.println(dt*1000000.0);
+readSensor();
+debug();
 
-//Serial.print("direction: ");
-//Serial.println(direction);
-
-//wczytanie sygnały zadanego od użytkownika i wykonanie cyklu PID
+//wczytanie sygnały zadanego od użytkownika
 if (Serial.available() > 0) {
   typed = Serial.parseInt();
   if (typed > 0) {
@@ -113,16 +121,12 @@ if (Serial.available() > 0) {
   }
 }
 
+//wykonanie cyklu PID
 PID(inputPosition);
 
 //wysłanie sygnału do elementu wykonawczego (sterownika silnika)
 ledcWrite(channel, pwm); // wysłanie prędkości
 digitalWrite(IN1, direction); // wysłanie kierunku
 digitalWrite(IN2, !direction);
-
-//debug
-//Serial.print("pwm: ");
-//Serial.println(pwm);
-//Serial.println();
 
 }
