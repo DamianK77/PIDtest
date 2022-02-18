@@ -29,7 +29,8 @@ float kp = 0.617; //współczynnik KP
 float ki = 0.0; //współczynnik KI
 float kd = 0.0; //współczynnik KD
 int inputPosition = 50;  //pozycja zadana
-int pwm = 0;  //wyjście do elementu sterującego silnikiem
+int pid = 0;  //wyjście pętli pid
+int pwm = 0;  //wyjście do sterowania silnikiem (0-255)
 float error = 0.0;  //uchyb
 float totalError = 0.0;  //kumulowany uchyb
 float prevError = 0.0; //poprzedni uchyb
@@ -59,7 +60,7 @@ void setup () {
   Serial.begin(9600);
 }
 
-// funkcja wykonująca PID, zapisuje wartość w zmiennej pwm, jako wejście jest sygnał zadany - pozycja od 0 do 255
+// funkcja wykonująca PID, zapisuje wartość w zmiennej pid, jako wejście jest sygnał zadany - pozycja od 0 do 255
 void PID (int input) {
 
 
@@ -69,10 +70,14 @@ void PID (int input) {
   sensorScaled = map(filteredSensor, 0, 4095, 0, 255); //skalowanie sensora do wartości 8-bitowej
 
   error = input - sensorScaled; //liczenie uchybu (węzeł na wejściu pętli sterowania)
-  totalError += error; //kumulacyjny uchyb (do całkowania)
+
+  if (~(pid >= pwm && error*pid >= 0)){ // prosty filtr anti-windup, wytłumaczone https://www.youtube.com/watch?v=UMit8mVCJ_I
+  totalError += error; //kumulacyjny uchyb (do całkowania), todo: anti windup, na razie bardzo prosta implementacja, przestajemy całkować kiedy na silnik jest już podawany maksymalny sygnał (255 => 100% PWM)
+  }
+
   diffError = error-prevError;  //różnica uchybów (de do różniczkowania)
 
-  pwm = kp*error + ki*totalError*dt + kd*diffError/dt; //PID (k + całka + różniczka)
+  pid = kp*error + ki*totalError*dt + kd*diffError/dt; //PID (k + całka + różniczka)
   
   if (error > 0){ //zmiana kierunku silnika w zależności od tego w którą stronę jest uchyb
     direction = 0;
@@ -80,7 +85,7 @@ void PID (int input) {
     direction = 1;
   }
 
-  pwm = constrain(abs(pwm), 0, 255); // wyeliminowanie większych wartości niż jest w stanie podać pin (255 to wartość odpowiadająca 100% wypełnieniu sygnału) oraz wzięcie wartości bezwzględnej bo kierunek regulujemy przez direction
+  pwm = constrain(abs(pid), 0, 255); // wyeliminowanie większych wartości niż jest w stanie podać pin (255 to wartość odpowiadająca 100% wypełnieniu sygnału) oraz wzięcie wartości bezwzględnej bo kierunek regulujemy przez direction
 
   prevError = error;  // zapisanie poprzednich wartości
   prevt = t;
@@ -99,7 +104,7 @@ void debug () {
   Serial.print(" ");
   Serial.println(inputPosition);
   //Serial.print(" ");
-  //Serial.print(pwm);
+  //Serial.print(pid);
   //Serial.print("  ");
   //Serial.println(dt*1000000.0);
   //Serial.print("direction: ");
