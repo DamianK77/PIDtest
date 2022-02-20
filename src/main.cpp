@@ -11,7 +11,6 @@
 #define senspin 32
 #define IN1 19
 #define IN2 23
-
 //wartości dla inicjalizacji PWM
 const int freq = 30000; //częstotliwość pwm
 const int channel = 0;  //kanał pwm
