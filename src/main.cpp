@@ -24,9 +24,9 @@ unsigned long t = 0;  //czas od początku programu (mikrosekundy)
 float dt = 0.0;  //różnica czasu
 unsigned long prevt = 0;  //poprzedni czas
 //wartości do pętli PID
-float kp = 1; //współczynnik KP
+float kp = 0.5; //współczynnik KP
 float ki = 0.0; //współczynnik KI
-float kd = 0.0; //współczynnik KD
+float kd = 0; //współczynnik KD
 int inputPosition = 50;  //pozycja zadana
 int pid = 0;  //wyjście pętli pid
 int pwm = 0;  //wyjście do sterowania silnikiem (0-255)
