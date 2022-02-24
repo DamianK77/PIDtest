@@ -38,7 +38,7 @@ bool direction = 0; //kierunek obrotu silnika
 
 int typed = 0;  //wpisane do portu szeregowego
 //konstruktor filtru MA
-movingAvg sensor(4); 
+movingAvg sensor(1); 
 
 void setup () {
 
