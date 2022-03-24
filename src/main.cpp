@@ -70,7 +70,7 @@ void PID (int input) {
 
   error = input - sensorScaled; //liczenie uchybu (węzeł na wejściu pętli sterowania)
 
-  if (~(pid >= pwm && error*pid >= 0)){ // prosty filtr anti-windup, wytłumaczone https://www.youtube.com/watch?v=UMit8mVCJ_I
+  if (~(pid > pwm && error*pid >= 0)){ // prosty filtr anti-windup, wytłumaczone https://www.youtube.com/watch?v=UMit8mVCJ_I
   totalError += error; //kumulacyjny uchyb (do całkowania), todo: anti windup, na razie bardzo prosta implementacja, przestajemy całkować kiedy na silnik jest już podawany maksymalny sygnał (255 => 100% PWM)
   }
 
